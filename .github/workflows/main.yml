@@ -14,7 +14,7 @@ jobs:
         working-directory: terraform
 
     steps:
-      # 1. Checkout repo
+      # 1. Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -22,22 +22,30 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 3. Terraform Init
+      # 3. Configure AWS Credentials (🔥 THIS WAS MISSING)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 4. Terraform Init
       - name: Terraform Init
         run: terraform init
 
-      # 4. Terraform Format Check
+      # 5. Terraform Format Check
       - name: Terraform Format
         run: terraform fmt -check
 
-      # 5. Terraform Validate
+      # 6. Terraform Validate
       - name: Terraform Validate
         run: terraform validate
 
-      # 6. Terraform Plan
+      # 7. Terraform Plan
       - name: Terraform Plan
         run: terraform plan
 
-      # 7. Terraform Apply (ADDED)
+      # 8. Terraform Apply (optional)
       - name: Terraform Apply
         run: terraform apply -auto-approve
