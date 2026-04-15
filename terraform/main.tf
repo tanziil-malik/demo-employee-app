@@ -8,7 +8,7 @@ resource "aws_vpc" "devops_vpc" {
     Name = "devops-vpc"
   }
 }
-
+ 
 # ---------------------------
 # Subnet (Public)
 # ---------------------------
