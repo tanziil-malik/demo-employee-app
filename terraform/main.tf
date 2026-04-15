@@ -63,32 +63,36 @@ resource "aws_route_table_association" "public_assoc" {
 resource "aws_security_group" "devops_sg" {
   vpc_id = aws_vpc.devops_vpc.id
 
+  # SSH
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # SSH
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Frontend
   ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Frontend
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Backend
   ingress {
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Backend
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # HTTP
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # HTTP
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -104,6 +108,14 @@ resource "aws_security_group" "devops_sg" {
 }
 
 # ---------------------------
+# SSH KEY PAIR (🔥 ADDED)
+# ---------------------------
+resource "aws_key_pair" "devops_key" {
+  key_name   = "devops-key"
+  public_key = file("${path.module}/devops-key.pub")
+}
+
+# ---------------------------
 # EC2 Instance
 # ---------------------------
 resource "aws_instance" "devops_server" {
@@ -112,6 +124,9 @@ resource "aws_instance" "devops_server" {
 
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.devops_sg.id]
+
+  # 🔥 SSH ENABLED
+  key_name = aws_key_pair.devops_key.key_name
 
   tags = {
     Name = "devops-ec2"
